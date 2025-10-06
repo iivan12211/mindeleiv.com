@@ -1,0 +1,233 @@
+<title>Полная таблица Менделеева</title> <style> body { font-family: Arial, sans-serif; max-width: 1400px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+    .periodic-table {
+        display: grid;
+        grid-template-columns: repeat(18, 65px);
+        gap: 2px;
+        margin: 20px 0;
+        justify-content: center;
+    }
+    
+    .element {
+        border: 1px solid #999;
+        padding: 6px 2px;
+        cursor: pointer;
+        text-align: center;
+        background: #e3f2fd;
+        border-radius: 4px;
+        font-size: 11px;
+        transition: all 0.2s;
+        min-height: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .element:hover {
+        background: #bbdefb;
+        transform: scale(1.05);
+    }
+    
+    #element-info {
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px solid #2196f3;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .loading { color: #666; font-style: italic; }
+    .error { color: #f44336; }
+    .element-number { font-weight: bold; font-size: 10px; }
+    .element-symbol { font-weight: bold; font-size: 14px; margin: 2px 0; }
+    .element-name { font-size: 9px; }
+</style>
+🧪 Полная таблица Менделеева (118 элементов)
+Кликните на любой элемент для получения информации из Wikipedia
+
+<div class="periodic-table" id="periodicTable"></div>
+
+<div id="element-info">
+    <p class="loading">Выберите элемент для просмотра информации...</p>
+</div>
+
+<script>
+    // ПОЛНЫЙ СПИСОК ИЗ 118 ЭЛЕМЕНТОВ
+    const elements = [
+        {number: 1, symbol: "H", name: "Водород", group: "Неметаллы"},
+        {number: 2, symbol: "He", name: "Гелий", group: "Инертные газы"},
+        {number: 3, symbol: "Li", name: "Литий", group: "Щелочные металлы"},
+        {number: 4, symbol: "Be", name: "Бериллий", group: "Щёлочноземельные металлы"},
+        {number: 5, symbol: "B", name: "Бор", group: "Полуметаллы"},
+        {number: 6, symbol: "C", name: "Углерод", group: "Неметаллы"},
+        {number: 7, symbol: "N", name: "Азот", group: "Неметаллы"},
+        {number: 8, symbol: "O", name: "Кислород", group: "Неметаллы"},
+        {number: 9, symbol: "F", name: "Фтор", group: "Галогены"},
+        {number: 10, symbol: "Ne", name: "Неон", group: "Инертные газы"},
+        {number: 11, symbol: "Na", name: "Натрий", group: "Щелочные металлы"},
+        {number: 12, symbol: "Mg", name: "Магний", group: "Щёлочноземельные металлы"},
+        {number: 13, symbol: "Al", name: "Алюминий", group: "Постпереходные металлы"},
+        {number: 14, symbol: "Si", name: "Кремний", group: "Полуметаллы"},
+        {number: 15, symbol: "P", name: "Фосфор", group: "Неметаллы"},
+        {number: 16, symbol: "S", name: "Сера", group: "Неметаллы"},
+        {number: 17, symbol: "Cl", name: "Хлор", group: "Галогены"},
+        {number: 18, symbol: "Ar", name: "Аргон", group: "Инертные газы"},
+        {number: 19, symbol: "K", name: "Калий", group: "Щелочные металлы"},
+        {number: 20, symbol: "Ca", name: "Кальций", group: "Щёлочноземельные металлы"},
+        {number: 21, symbol: "Sc", name: "Скандий", group: "Переходные металлы"},
+        {number: 22, symbol: "Ti", name: "Титан", group: "Переходные металлы"},
+        {number: 23, symbol: "V", name: "Ванадий", group: "Переходные металлы"},
+        {number: 24, symbol: "Cr", name: "Хром", group: "Переходные металлы"},
+        {number: 25, symbol: "Mn", name: "Марганец", group: "Переходные металлы"},
+        {number: 26, symbol: "Fe", name: "Железо", group: "Переходные металлы"},
+        {number: 27, symbol: "Co", name: "Кобальт", group: "Переходные металлы"},
+        {number: 28, symbol: "Ni", name: "Никель", group: "Переходные металлы"},
+        {number: 29, symbol: "Cu", name: "Медь", group: "Переходные металлы"},
+        {number: 30, symbol: "Zn", name: "Цинк", group: "Переходные металлы"},
+        {number: 31, symbol: "Ga", name: "Галлий", group: "Постпереходные металлы"},
+        {number: 32, symbol: "Ge", name: "Германий", group: "Полуметаллы"},
+        {number: 33, symbol: "As", name: "Мышьяк", group: "Полуметаллы"},
+        {number: 34, symbol: "Se", name: "Селен", group: "Неметаллы"},
+        {number: 35, symbol: "Br", name: "Бром", group: "Галогены"},
+        {number: 36, symbol: "Kr", name: "Криптон", group: "Инертные газы"},
+        {number: 37, symbol: "Rb", name: "Рубидий", group: "Щелочные металлы"},
+        {number: 38, symbol: "Sr", name: "Стронций", group: "Щёлочноземельные металлы"},
+        {number: 39, symbol: "Y", name: "Иттрий", group: "Переходные металлы"},
+        {number: 40, symbol: "Zr", name: "Цирконий", group: "Переходные металлы"},
+        {number: 41, symbol: "Nb", name: "Ниобий", group: "Переходные металлы"},
+        {number: 42, symbol: "Mo", name: "Молибден", group: "Переходные металлы"},
+        {number: 43, symbol: "Tc", name: "Технеций", group: "Переходные металлы"},
+        {number: 44, symbol: "Ru", name: "Рутений", group: "Переходные металлы"},
+        {number: 45, symbol: "Rh", name: "Родий", group: "Переходные металлы"},
+        {number: 46, symbol: "Pd", name: "Палладий", group: "Переходные металлы"},
+        {number: 47, symbol: "Ag", name: "Серебро", group: "Переходные металлы"},
+        {number: 48, symbol: "Cd", name: "Кадмий", group: "Переходные металлы"},
+        {number: 49, symbol: "In", name: "Индий", group: "Постпереходные металлы"},
+        {number: 50, symbol: "Sn", name: "Олово", group: "Постпереходные металлы"},
+        {number: 51, symbol: "Sb", name: "Сурьма", group: "Полуметаллы"},
+        {number: 52, symbol: "Te", name: "Теллур", group: "Полуметаллы"},
+        {number: 53, symbol: "I", name: "Иод", group: "Галогены"},
+        {number: 54, symbol: "Xe", name: "Ксенон", group: "Инертные газы"},
+        {number: 55, symbol: "Cs", name: "Цезий", group: "Щелочные металлы"},
+        {number: 56, symbol: "Ba", name: "Барий", group: "Щёлочноземельные металлы"},
+        {number: 57, symbol: "La", name: "Лантан", group: "Лантаноиды"},
+        {number: 58, symbol: "Ce", name: "Церий", group: "Лантаноиды"},
+        {number: 59, symbol: "Pr", name: "Празеодим", group: "Лантаноиды"},
+        {number: 60, symbol: "Nd", name: "Неодим", group: "Лантаноиды"},
+        {number: 61, symbol: "Pm", name: "Прометий", group: "Лантаноиды"},
+        {number: 62, symbol: "Sm", name: "Самарий", group: "Лантаноиды"},
+        {number: 63, symbol: "Eu", name: "Европий", group: "Лантаноиды"},
+        {number: 64, symbol: "Gd", name: "Гадолиний", group: "Лантаноиды"},
+        {number: 65, symbol: "Tb", name: "Тербий", group: "Лантаноиды"},
+        {number: 66, symbol: "Dy", name: "Диспрозий", group: "Лантаноиды"},
+        {number: 67, symbol: "Ho", name: "Гольмий", group: "Лантаноиды"},
+        {number: 68, symbol: "Er", name: "Эрбий", group: "Лантаноиды"},
+        {number: 69, symbol: "Tm", name: "Тулий", group: "Лантаноиды"},
+        {number: 70, symbol: "Yb", name: "Иттербий", group: "Лантаноиды"},
+        {number: 71, symbol: "Lu", name: "Лютеций", group: "Лантаноиды"},
+        {number: 72, symbol: "Hf", name: "Гафний", group: "Переходные металлы"},
+        {number: 73, symbol: "Ta", name: "Тантал", group: "Переходные металлы"},
+        {number: 74, symbol: "W", name: "Вольфрам", group: "Переходные металлы"},
+        {number: 75, symbol: "Re", name: "Рений", group: "Переходные металлы"},
+        {number: 76, symbol: "Os", name: "Осмий", group: "Переходные металлы"},
+        {number: 77, symbol: "Ir", name: "Иридий", group: "Переходные металлы"},
+        {number: 78, symbol: "Pt", name: "Платина", group: "Переходные металлы"},
+        {number: 79, symbol: "Au", name: "Золото", group: "Переходные металлы"},
+        {number: 80, symbol: "Hg", name: "Ртуть", group: "Переходные металлы"},
+        {number: 81, symbol: "Tl", name: "Таллий", group: "Постпереходные металлы"},
+        {number: 82, symbol: "Pb", name: "Свинец", group: "Постпереходные металлы"},
+        {number: 83, symbol: "Bi", name: "Висмут", group: "Постпереходные металлы"},
+        {number: 84, symbol: "Po", name: "Полоний", group: "Полуметаллы"},
+        {number: 85, symbol: "At", name: "Астат", group: "Галогены"},
+        {number: 86, symbol: "Rn", name: "Радон", group: "Инертные газы"},
+        {number: 87, symbol: "Fr", name: "Франций", group: "Щелочные металлы"},
+        {number: 88, symbol: "Ra", name: "Радий", group: "Щёлочноземельные металлы"},
+        {number: 89, symbol: "Ac", name: "Актиний", group: "Актиноиды"},
+        {number: 90, symbol: "Th", name: "Торий", group: "Актиноиды"},
+        {number: 91, symbol: "Pa", name: "Протактиний", group: "Актиноиды"},
+        {number: 92, symbol: "U", name: "Уран", group: "Актиноиды"},
+        {number: 93, symbol: "Np", name: "Нептуний", group: "Актиноиды"},
+        {number: 94, symbol: "Pu", name: "Плутоний", group: "Актиноиды"},
+        {number: 95, symbol: "Am", name: "Америций", group: "Актиноиды"},
+        {number: 96, symbol: "Cm", name: "Кюрий", group: "Актиноиды"},
+        {number: 97, symbol: "Bk", name: "Берклий", group: "Актиноиды"},
+        {number: 98, symbol: "Cf", name: "Калифорний", group: "Актиноиды"},
+        {number: 99, symbol: "Es", name: "Эйнштейний", group: "Актиноиды"},
+        {number: 100, symbol: "Fm", name: "Фермий", group: "Актиноиды"},
+        {number: 101, symbol: "Md", name: "Менделевий", group: "Актиноиды"},
+        {number: 102, symbol: "No", name: "Нобелий", group: "Актиноиды"},
+        {number: 103, symbol: "Lr", name: "Лоуренсий", group: "Актиноиды"},
+        {number: 104, symbol: "Rf", name: "Резерфордий", group: "Переходные металлы"},
+        {number: 105, symbol: "Db", name: "Дубний", group: "Переходные металлы"},
+        {number: 106, symbol: "Sg", name: "Сиборгий", group: "Переходные металлы"},
+        {number: 107, symbol: "Bh", name: "Борий", group: "Переходные металлы"},
+        {number: 108, symbol: "Hs", name: "Хассий", group: "Переходные металлы"},
+        {number: 109, symbol: "Mt", name: "Мейтнерий", group: "Переходные металлы"},
+        {number: 110, symbol: "Ds", name: "Дармштадтий", group: "Переходные металлы"},
+        {number: 111, symbol: "Rg", name: "Рентгений", group: "Переходные металлы"},
+        {number: 112, symbol: "Cn", name: "Коперниций", group: "Переходные металлы"},
+        {number: 113, symbol: "Nh", name: "Нихоний", group: "Постпереходные металлы"},
+        {number: 114, symbol: "Fl", name: "Флеровий", group: "Постпереходные металлы"},
+        {number: 115, symbol: "Mc", name: "Московий", group: "Постпереходные металлы"},
+        {number: 116, symbol: "Lv", name: "Ливерморий", group: "Постпереходные металлы"},
+        {number: 117, symbol: "Ts", name: "Теннессин", group: "Галогены"},
+        {number: 118, symbol: "Og", name: "Оганесон", group: "Инертные газы"}
+    ];
+
+    // Создаем таблицу
+    function createPeriodicTable() {
+        const table = document.getElementById('periodicTable');
+        
+        elements.forEach(element => {
+            const elementDiv = document.createElement('div');
+            elementDiv.className = 'element';
+            elementDiv.innerHTML = `
+                <div class="element-number">${element.number}</div>
+                <div class="element-symbol">${element.symbol}</div>
+                <div class="element-name">${element.name}</div>
+            `;
+            elementDiv.addEventListener('click', () => showElementInfo(element));
+            table.appendChild(elementDiv);
+        });
+    }
+
+    // Показываем информацию об элементе
+    async function showElementInfo(element) {
+        const infoDiv = document.getElementById('element-info');
+        infoDiv.innerHTML = `<p class="loading">⏳ Загружаем информацию о ${element.name}...</p>`;
+        
+        try {
+            const response = await fetch(
+                `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(element.name)}`
+            );
+            
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки');
+            }
+            
+            const data = await response.json();
+            
+            infoDiv.innerHTML = `
+                <h2>${element.name} (${element.symbol})</h2>
+                <p><strong>Атомный номер:</strong> ${element.number}</p>
+                <p><strong>Группа:</strong> ${element.group}</p>
+                <p>${data.extract}</p>
+                <a href="${data.content_urls.desktop.page}" target="_blank" style="color:#2196f3;">
+                    📖 Читать подробнее в Wikipedia
+                </a>
+            `;
+        } catch (error) {
+            infoDiv.innerHTML = `
+                <h2>${element.name} (${element.symbol})</h2>
+                <p><strong>Атомный номер:</strong> ${element.number}</p>
+                <p><strong>Группа:</strong> ${element.group}</p>
+                <p class="error">⚠️ Не удалось загрузить информацию из Wikipedia</p>
+                <p>Проверьте подключение к интернету</p>
+            `;
+        }
+    }
+
+    // Запускаем создание таблицы при загрузке страницы
+    document.addEventListener('DOMContentLoaded', createPeriodicTable);
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-ВАШ_НОМЕР"></script> <script> (adsbygoogle = window.adsbygoogle || []).push({}); </script>

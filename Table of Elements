@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная таблица Менделеева</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .mendeleev-bio {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .mendeleev-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .mendeleev-portrait {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #e74c3c;
+            object-fit: cover;
+        }
+
+        .bio-text {
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .bio-text h1 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+
+        .bio-text p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .ad-container {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .ad-banner {
+            max-width: 728px;
+            height: 90px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            margin: 0 auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .table-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .table-title h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 65px);
+            gap: 3px;
+            margin: 30px 0;
+            justify-content: center;
+        }
+
+        .element {
+            border: 2px solid #bdc3c7;
+            padding: 8px 4px;
+            cursor: pointer;
+            text-align: center;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 8px;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            min-height: 75px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .element:hover {
+            transform: scale(1.08);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-color: #3498db;
+        }
+
+        .element-number {
+            font-weight: bold;
+            font-size: 10px;
+            color: #2c3e50;
+        }
+
+        .element-symbol {
+            font-weight: bold;
+            font-size: 16px;
+            margin: 3px 0;
+            color: #e74c3c;
+        }
+
+        .element-name {
+            font-size: 9px;
+            color: #34495e;
+        }
+
+        #element-info {
+            margin: 30px 0;
+            padding: 25px;
+            border: 3px solid #3498db;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .info-container {
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        .info-image-container {
+            border: 3px solid #27ae60;
+            border-radius: 12px;
+            padding: 15px;
+            background: linear-gradient(135deg, #d4efdf, #a9dfbf);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            min-width: 200px;
+        }
+
+        .info-image {
+            width: 170px;
+            height: 170px;
+            border-radius: 8px;
+            object-fit: cover;
+            display: block;
+            border: 2px solid #229954;
+        }
+
+        .info-text {
+            flex: 1;
+            border: 2px solid #f39c12;
+            border-radius: 12px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fef9e7, #fdebd0);
+        }
+
+        .info-text h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .info-text p {
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            color: #34495e;
+        }
+
+        .loading {
+            color: #7f8c8d;
+            font-style: italic;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .mendeleev-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .periodic-table {
+                grid-template-columns: repeat(9, 60px);
+            }
+            
+            .info-container {
+                flex-direction: column;
+            }
+            
+            .info-image-container {
+                align-self: center;
+            }
+        }
+    </style>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <section class="mendeleev-bio">
+            <div class="mendeleev-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Dmitri_Mendeleev_photo.jpg/800px-Dmitri_Mendeleev_photo.jpg" 
+                     alt="Дмитрий Менделеев" class="mendeleev-portrait">
+                <div class="bio-text">
+                    <h1>Дмитрий Иванович Менделеев</h1>
+                    <p><strong>Годы жизни:</strong> 1834-1907</p>
+                    <p><strong>Вклад в науку:</strong> Создатель периодической системы химических элементов — одного из фундаментальных законов природы.</p>
+                    <p><strong>Достижения:</strong> Открыл периодический закон, разработал таблицу элементов, предсказал свойства неизвестных элементов.</p>
+                    <p>«Нет без явного усиленного трудолюбия ни талантов, ни гениев» — Д.И. Менделеев</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="ad-container">
+            <div class="ad-banner">
+                Рекламный блок
+            </div>
+        </section>
+
+        <section class="main-content">
+            <div class="table-title">
+                <h2>🧪 Интерактивная таблица Менделеева</h2>
+                <p>Кликните на любой элемент для получения подробной информации</p>
+            </div>
+
+            <div class="periodic-table" id="periodicTable"></div>
+
+            <div id="element-info">
+                <p class="loading">Выберите элемент для просмотра информации...</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>© 2024 Интерактивная таблица Менделеева. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <script>
+        function getElementImageUrl(elementName, elementSymbol) {
+            const images = {
+                'Литий': 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Lithium_paraffin.jpg',
+                'Натрий': 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Sodium.jpg',
+                'Калий': 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Potassium.JPG',
+                'Магний': 'https://upload.wikimedia.org/wikipedia/commons/3/33/Magnesium_crystals.jpg',
+                'Алюминий': 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Aluminium.jpg',
+                'Железо': 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Iron_electrolytic_and_1cm3_cube.jpg',
+                'Медь': 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Copper.jpg',
+                'Серебро': 'https://upload.wikimedia.org/wikipedia/commons/4/44/Silver.jpg',
+                'Золото': 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Gold-crystals.jpg',
+                'Титан': 'https://upload.wikimedia.org/wikipedia/commons/3/36/Titanium_crystal_bar.jpg',
+                'Углерод': 'https://upload.wikimedia.org/wikipedia/commons/6/68/Diamond_and_graphite.jpg',
+                'Сера': 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Sulfur-sample.jpg',
+                'Фосфор': 'https://upload.wikimedia.org/wikipedia/commons/5/5c/PhosphComby.jpg',
+                'Водород': 'https://upload.wikimedia.org/wikipedia/commons/3/32/Hydrogen_discharge_tube.jpg',
+                'Кислород': 'https://upload.wikimedia.org/wikipedia/commons/b/bf/Liquid_oxygen_in_a_beaker_%28cropped_and_retouched%29.jpg',
+                'Азот': 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Liquidnitrogen.jpg',
+                'default': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/1024px-Placeholder_view_vector.svg.png'
+            };
+            
+            return images[elementName] || images['default'];
+        }
+
+        const elements = [
+            {number: 1, symbol: "H", name: "Водород", group: "Неметаллы"},
+            {number: 2, symbol: "He", name: "Гелий", group: "Инертные газы"},
+            {number: 3, symbol: "Li", name: "Литий", group: "Щелочные металлы"},
+            {number: 4, symbol: "Be", name: "Бериллий", group: "Щёлочноземельные металлы"},
+            {number: 5, symbol: "B", name: "Бор", group: "Полуметаллы"},
+            {number: 6, symbol: "C", name: "Углерод", group: "Неметаллы"},
+            {number: 7, symbol: "N", name: "Азот", group: "Неметаллы"},
+            {number: 8, symbol: "O", name: "Кислород", group: "Неметаллы"},
+            {number: 9, symbol: "F", name: "Фтор", group: "Галогены"},
+            {number: 10, symbol: "Ne", name: "Неон", group: "Инертные газы"},
+            {number: 11, symbol: "Na", name: "Натрий", group: "Щелочные металлы"},
+            {number: 12, symbol: "Mg", name: "Магний", group: "Щёлочноземельные металлы"},
+            {number: 13, symbol: "Al", name: "Алюминий", group: "Постпереходные металлы"},
+            {number: 14, symbol: "Si", name: "Кремний", group: "Полуметаллы"},
+            {number: 15, symbol: "P", name: "Фосфор", group: "Неметаллы"},
+            {number: 16, symbol: "S", name: "Сера", group: "Неметаллы"},
+            {number: 17, symbol: "Cl", name: "Хлор", group: "Галогены"},
+            {number: 18, symbol: "Ar", name: "Аргон", group: "Инертные газы"},
+            {number: 19, symbol: "K", name: "Калий", group: "Щелочные металлы"},
+            {number: 20, symbol: "Ca", name: "Кальций", group: "Щёлочноземельные металлы"}
+        ];
+
+        function createPeriodicTable() {
+            const table = document.getElementById('periodicTable');
+            
+            elements.forEach(element => {
+                const elementDiv = document.createElement('div');
+                elementDiv.className = 'element';
+                elementDiv.innerHTML = `
+                    <div class="element-number">${element.number}</div>
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name}</div>
+                `;
+                elementDiv.addEventListener('click', () => showElementInfo(element));
+                table.appendChild(elementDiv);
+            });
+        }
+
+        async function showElementInfo(element) {
+            const infoDiv = document.getElementById('element-info');
+            infoDiv.innerHTML = `<p class="loading">⏳ Загружаем информацию о ${element.name}...</p>`;
+            
+            try {
+                const response = await fetch(
+                    `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(element.name)}`
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки');
+                }
+                
+                const data = await response.json();
+                
+                infoDiv.innerHTML = `
+                    <div class="info-container">
+                        <div class="info-image-container">
+                            <img class="info-image" src="${getElementImageUrl(element.name, element.symbol)}" 
+                                 alt="${element.name}" 
+                                 onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg'">
+                        </div>
+                        <div class="info-text">
+                            <h2>${element.name} (${element.symbol})</h2>
+                            <p><strong>Атомный номер:</strong> ${element.number}</p>
+                            <p><strong>Группа:</strong> ${element.group}</p>
+                            <p>${data.extract}</p>
+                            <a href="${data.content_urls.desktop.page}" target="_blank" style="color:#2196f3; text-decoration: none; font-weight: bold;">
+                                📖 Читать подробнее в Wikipedia
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                infoDiv.innerHTML = `
+                    <div class="info-container">
+                        <div class="info-image-container">
+                            <img class="info-image" src="${getElementImageUrl(element.name, element.symbol)}" 
+                                 alt="${element.name}">
+                        </div>
+                        <div class="info-text">
+                            <h2>${element.name} (${element.symbol})</h2>
+                            <p><strong>Атомный номер:</strong> ${element.number}</p>
+                            <p><strong>Группа:</strong> ${element.group}</p>
+                            <p class="error">⚠️ Не удалось загрузить информацию из Wikipedia</p>
+                            <p>Проверьте подключение к интернету</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createPeriodicTable();
+        });
+    </script>
+</body>
+</html>
